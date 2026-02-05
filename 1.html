@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý điểm - CNTT4 K26</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-green: #27ae60;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+            --text: #2c3e50;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: var(--primary-green);
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .input-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary-green); }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-add {
+            background: var(--primary-green);
+            color: white;
+            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+        }
+
+        .btn-export {
+            background: #2d3436;
+            color: white;
+        }
+
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #f8f9fa;
+            border-bottom: 2px solid var(--primary-green);
+            padding: 15px;
+            text-align: left;
+        }
+
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+
+        .rank-gioi { color: #27ae60; font-weight: bold; }
+        .rank-hoc-lai { 
+            color: #e74c3c; 
+            font-weight: bold;
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>CNTT4 K26 - ĐẠI HỌC HẢI PHÒNG</h1>
+
+    <div class="input-box">
+        <input type="text" id="name" placeholder="Tên sinh viên">
+        <input type="text" id="subject" placeholder="Môn học">
+        <input type="number" id="tc" placeholder="Số tín">
+        <input type="number" id="score" step="0.1" placeholder="Điểm hệ 10">
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-add" onclick="addRow()">THÊM DỮ LIỆU</button>
+        <button class="btn-export" onclick="exportExcel()">XUẤT EXCEL</button>
+    </div>
+
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>Họ Tên</th>
+                <th>Môn Học</th>
+                <th>Tín Chỉ</th>
+                <th>Điểm</th>
+                <th>Xếp Loại</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    function addRow() {
+        const name = document.getElementById('name').value;
+        const sub = document.getElementById('subject').value;
+        const tc = document.getElementById('tc').value;
+        const score = parseFloat(document.getElementById('score').value);
+
+        if(!name || isNaN(score)) return alert("Nhập đủ thông tin đi men!");
+
+        let xl = "Trung bình";
+        let cl = "";
+        if(score >= 8.5) { xl="Giỏi"; cl="rank-gioi"; }
+        else if(score >= 6.5) { xl="Khá"; }
+        else if(score < 4.0) { xl="Học lại"; cl="rank-hoc-lai"; }
+
+        const tbody = document.querySelector('#myTable tbody');
+        const row = `<tr>
+            <td>${name}</td>
+            <td>${sub}</td>
+            <td>${tc}</td>
+            <td>${score}</td>
+            <td class="${cl}">${xl}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+        document.getElementById('score').value = "";
+    }
+
+    function exportExcel() {
+        const table = document.getElementById("myTable");
+        const wb = XLSX.utils.table_to_book(table);
+        XLSX.writeFile(wb, "Diem_CNTT4_K26.xlsx");
+    }
+</script>
+
+</body>
+</html>
